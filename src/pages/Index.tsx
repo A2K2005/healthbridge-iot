@@ -7,6 +7,7 @@ import AppointmentCard from '../components/AppointmentCard';
 import EmergencyTracking from '../components/EmergencyTracking';
 import MentalHealthSupport from '../components/MentalHealthSupport';
 import Footer from '../components/Footer';
+import ChatBot from '../components/ChatBot/ChatBot';
 
 const Index: React.FC = () => {
   // Smooth scroll to section when clicking navigation links
@@ -58,6 +59,7 @@ const Index: React.FC = () => {
         <MentalHealthSupport />
       </main>
       <Footer />
+      <ChatBot />
     </div>
   );
 };
