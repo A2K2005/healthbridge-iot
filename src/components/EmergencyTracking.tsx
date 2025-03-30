@@ -1,9 +1,34 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import BlurEffect from './BlurEffect';
-import { Phone, Clock, MapPin } from 'lucide-react';
+import { Phone, Clock, MapPin, UserCheck, Check } from 'lucide-react';
+import { toast } from 'sonner';
 
 const EmergencyTracking: React.FC = () => {
+  const [isCallingDriver, setIsCallingDriver] = useState(false);
+  const [sosSent, setSosSent] = useState(false);
+
+  const handleCallDriver = () => {
+    setIsCallingDriver(true);
+    toast.info("Connecting to driver...", { duration: 2000 });
+    
+    setTimeout(() => {
+      setIsCallingDriver(false);
+      toast.success("Connected with Driver");
+    }, 2000);
+  };
+
+  const handleSendSOS = () => {
+    if (sosSent) return;
+    
+    setSosSent(true);
+    toast.success("Emergency SOS sent successfully!", {
+      description: "Additional medical team has been dispatched to your location."
+    });
+    
+    setTimeout(() => setSosSent(false), 10000);
+  };
+
   return (
     <section id="emergency" className="section-container bg-white relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
@@ -14,24 +39,59 @@ const EmergencyTracking: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <BlurEffect>
             <div className="glass-effect rounded-2xl overflow-hidden shadow-lg">
-              <div className="relative aspect-[4/3] w-full bg-gray-100">
-                {/* Map placeholder */}
-                <div className="absolute inset-0 bg-medical-blue-900/20">
-                  <div className="h-full w-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjIiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0aDN2M2gtM3ptMC04aDN2M2gtM3ptLTgtOGgzdjNoLTN6bTgtMGgzdjNoLTN6bS04IDhoM3YzaC0zem0wIDhoM3YzaC0zem0tOC04aDN2M2gtM3ptMCA4aDN2M2gtM3ptMC04aDN2M2gtM3oiLz48L2c+PC9nPjwvc3ZnPg==')]"></div>
-                </div>
-                
-                {/* Map overlay with routes and markers */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative w-4/5 h-4/5">
-                    {/* Campus marker */}
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                      <div className="w-4 h-4 bg-medical-blue-500 rounded-full"></div>
-                      <div className="w-10 h-10 bg-medical-blue-500/30 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse"></div>
+              <div className="relative aspect-[4/3] w-full">
+                {/* Enhanced Map */}
+                <div className="absolute inset-0 bg-[#EBF3FB]">
+                  {/* Map grid lines */}
+                  <div className="absolute inset-0 grid grid-cols-6 grid-rows-6">
+                    {Array.from({ length: 7 }).map((_, i) => (
+                      <div key={`v-${i}`} className="absolute top-0 bottom-0 w-px bg-blue-200/50" style={{ left: `${(i/6) * 100}%` }} />
+                    ))}
+                    {Array.from({ length: 7 }).map((_, i) => (
+                      <div key={`h-${i}`} className="absolute left-0 right-0 h-px bg-blue-200/50" style={{ top: `${(i/6) * 100}%` }} />
+                    ))}
+                  </div>
+                  
+                  {/* Roads */}
+                  <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <path 
+                      d="M10,20 L40,20 L60,50 L90,50" 
+                      stroke="#D1DCE8" 
+                      strokeWidth="3" 
+                      fill="none" 
+                    />
+                    <path 
+                      d="M30,10 L30,30 L50,70 L50,90" 
+                      stroke="#D1DCE8" 
+                      strokeWidth="3" 
+                      fill="none" 
+                    />
+                    <path 
+                      d="M60,10 L60,90" 
+                      stroke="#D1DCE8" 
+                      strokeWidth="3" 
+                      fill="none" 
+                    />
+                  </svg>
+                  
+                  {/* Campus building */}
+                  <div className="absolute top-[15%] left-[55%] transform -translate-x-1/2 -translate-y-1/2">
+                    <div className="w-16 h-12 bg-blue-100 border-2 border-blue-300 shadow-md rounded-sm flex items-center justify-center">
+                      <div className="text-xs font-semibold text-blue-600">Campus</div>
                     </div>
-                    
-                    {/* Ambulance marker */}
-                    <div className="absolute top-[30%] left-[20%]">
-                      <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg">
+                  </div>
+                  
+                  {/* Hospital building */}
+                  <div className="absolute top-[80%] left-[60%] transform -translate-x-1/2 -translate-y-1/2">
+                    <div className="w-16 h-12 bg-red-100 border-2 border-red-300 shadow-md rounded-sm flex items-center justify-center">
+                      <div className="text-xs font-semibold text-red-600">Hospital</div>
+                    </div>
+                  </div>
+
+                  {/* Ambulance marker */}
+                  <div className="absolute top-[45%] left-[20%] transform -translate-x-1/2 -translate-y-1/2">
+                    <div className="relative">
+                      <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg animate-pulse border-2 border-red-500">
                         <svg className="w-5 h-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="m3 16 4 2 4-2 4 2 4-2"></path>
                           <path d="M22 12a10 9 0 0 0-20 0"></path>
@@ -42,20 +102,32 @@ const EmergencyTracking: React.FC = () => {
                       </div>
                       
                       {/* Pulsing effect */}
-                      <div className="w-12 h-12 bg-red-500/20 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse"></div>
+                      <div className="w-12 h-12 bg-red-500/20 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-ping"></div>
+                    </div>
+                  </div>
+                  
+                  {/* Current location marker */}
+                  <div className="absolute top-[50%] left-[70%] transform -translate-x-1/2 -translate-y-1/2">
+                    <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                      <div className="w-3 h-3 bg-white rounded-full"></div>
                     </div>
                     
-                    {/* Route line */}
-                    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                      <path 
-                        d="M20,30 Q35,40 50,50 T80,70" 
-                        stroke="#EF4444" 
-                        strokeWidth="1.5" 
-                        strokeDasharray="2 2" 
-                        fill="none" 
-                      />
-                    </svg>
+                    {/* Pulsing effect */}
+                    <div className="w-12 h-12 bg-blue-500/20 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-ping"></div>
                   </div>
+                  
+                  {/* Route path */}
+                  <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <path 
+                      d="M20,45 C30,45 40,45 50,50 S65,60 70,50" 
+                      stroke="#EF4444" 
+                      strokeWidth="2.5" 
+                      strokeDasharray="3 3" 
+                      fill="none" 
+                    />
+                    <circle cx="20" cy="45" r="2" fill="#EF4444" />
+                    <circle cx="70" cy="50" r="2" fill="#EF4444" />
+                  </svg>
                 </div>
                 
                 {/* Status bar */}
@@ -88,7 +160,7 @@ const EmergencyTracking: React.FC = () => {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold">Emergency Response</h3>
                   <span className="px-3 py-1 bg-red-100 text-red-600 text-sm font-medium rounded-full flex items-center">
-                    <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                    <span className="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse"></span>
                     Active
                   </span>
                 </div>
@@ -96,18 +168,43 @@ const EmergencyTracking: React.FC = () => {
                 <p className="text-gray-600 mb-6">Ambulance #A-103 is en route to your location. Medical team has been notified of your situation.</p>
                 
                 <div className="flex items-center justify-between">
-                  <button className="flex items-center justify-center gap-2 w-full mr-2 py-3 bg-medical-blue-50 rounded-lg text-medical-blue-600 font-medium hover:bg-medical-blue-100 transition-colors">
-                    <Phone className="h-4 w-4" />
-                    Call Driver
+                  <button 
+                    onClick={handleCallDriver}
+                    className={`flex items-center justify-center gap-2 w-full mr-2 py-3 ${isCallingDriver ? 'bg-green-100 text-green-700' : 'bg-medical-blue-50 text-medical-blue-600 hover:bg-medical-blue-100'} rounded-lg font-medium transition-colors`}
+                  >
+                    {isCallingDriver ? (
+                      <>
+                        <UserCheck className="h-4 w-4" />
+                        Connecting...
+                      </>
+                    ) : (
+                      <>
+                        <Phone className="h-4 w-4" />
+                        Call Driver
+                      </>
+                    )}
                   </button>
                   
-                  <button className="flex items-center justify-center gap-2 w-full ml-2 py-3 bg-red-500 rounded-lg text-white font-medium hover:bg-red-600 transition-colors">
-                    <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path>
-                      <path d="M9 18h6"></path>
-                      <path d="M10 22h4"></path>
-                    </svg>
-                    Emergency SOS
+                  <button 
+                    onClick={handleSendSOS}
+                    className={`flex items-center justify-center gap-2 w-full ml-2 py-3 ${sosSent ? 'bg-green-500 text-white' : 'bg-red-500 text-white hover:bg-red-600'} rounded-lg font-medium transition-colors`}
+                    disabled={sosSent}
+                  >
+                    {sosSent ? (
+                      <>
+                        <Check className="h-4 w-4" />
+                        SOS Sent
+                      </>
+                    ) : (
+                      <>
+                        <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path>
+                          <path d="M9 18h6"></path>
+                          <path d="M10 22h4"></path>
+                        </svg>
+                        Emergency SOS
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
@@ -133,7 +230,7 @@ const EmergencyTracking: React.FC = () => {
             
             <BlurEffect delay={400}>
               <div className="space-y-6 mt-8">
-                <div className="glass-effect rounded-lg p-5 flex items-start">
+                <div className="glass-effect rounded-lg p-5 flex items-start hover:shadow-md transition-all duration-300 cursor-pointer">
                   <div className="flex-shrink-0 mt-1">
                     <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
                       <svg className="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -145,11 +242,11 @@ const EmergencyTracking: React.FC = () => {
                   </div>
                   <div className="ml-4">
                     <h3 className="text-lg font-semibold mb-1">One-Touch Emergency Alert</h3>
-                    <p className="text-gray-600">Instantly notify emergency services with a single tap, automatically sharing your location and medical information.</p>
+                    <p className="text-gray-600">Instantly notify emergency services with a single tap, automatically sharing your location and medical information. Call our emergency number at <span className="font-semibold">+91-175-239-3000</span> for immediate assistance.</p>
                   </div>
                 </div>
                 
-                <div className="glass-effect rounded-lg p-5 flex items-start">
+                <div className="glass-effect rounded-lg p-5 flex items-start hover:shadow-md transition-all duration-300 cursor-pointer">
                   <div className="flex-shrink-0 mt-1">
                     <div className="w-10 h-10 rounded-full bg-medical-blue-100 flex items-center justify-center">
                       <svg className="h-5 w-5 text-medical-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -167,11 +264,11 @@ const EmergencyTracking: React.FC = () => {
                   </div>
                   <div className="ml-4">
                     <h3 className="text-lg font-semibold mb-1">Real-Time Tracking</h3>
-                    <p className="text-gray-600">Monitor the ambulance location and estimated arrival time, providing peace of mind during emergencies.</p>
+                    <p className="text-gray-600">Monitor the ambulance location and estimated arrival time, providing peace of mind during emergencies. Our dispatch center can be reached at <span className="font-semibold">+91-175-239-4000</span>.</p>
                   </div>
                 </div>
                 
-                <div className="glass-effect rounded-lg p-5 flex items-start">
+                <div className="glass-effect rounded-lg p-5 flex items-start hover:shadow-md transition-all duration-300 cursor-pointer">
                   <div className="flex-shrink-0 mt-1">
                     <div className="w-10 h-10 rounded-full bg-medical-green-100 flex items-center justify-center">
                       <svg className="h-5 w-5 text-medical-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -182,7 +279,7 @@ const EmergencyTracking: React.FC = () => {
                   </div>
                   <div className="ml-4">
                     <h3 className="text-lg font-semibold mb-1">Immediate Medical Response</h3>
-                    <p className="text-gray-600">Our medical team is alerted instantly, allowing them to prepare for your specific emergency while en route.</p>
+                    <p className="text-gray-600">Our medical team is alerted instantly, allowing them to prepare for your specific emergency while en route. For medical consultations, call <span className="font-semibold">+91-175-239-5000</span>.</p>
                   </div>
                 </div>
               </div>

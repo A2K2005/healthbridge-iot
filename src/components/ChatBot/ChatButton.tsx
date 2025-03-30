@@ -2,6 +2,7 @@
 import React from 'react';
 import { MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 
 interface ChatButtonProps {
   onClick: () => void;
@@ -9,13 +10,30 @@ interface ChatButtonProps {
 
 const ChatButton: React.FC<ChatButtonProps> = ({ onClick }) => {
   return (
-    <Button
-      className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg flex items-center justify-center bg-medical-blue-600 hover:bg-medical-blue-700 z-50"
-      onClick={onClick}
-      aria-label="Open AI assistant"
+    <motion.div
+      initial={{ scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ 
+        type: "spring",
+        stiffness: 260,
+        damping: 20,
+        delay: 1 
+      }}
+      className="fixed bottom-6 right-6 z-50"
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
     >
-      <MessageSquare className="w-6 h-6" />
-    </Button>
+      <Button
+        className="rounded-full w-16 h-16 shadow-lg flex items-center justify-center bg-gradient-to-r from-medical-blue-500 to-medical-blue-700 hover:from-medical-blue-600 hover:to-medical-blue-800 transition-all duration-300"
+        onClick={onClick}
+        aria-label="Open AI assistant"
+      >
+        <MessageSquare className="w-7 h-7 text-white" />
+        <span className="absolute top-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+        
+        <div className="absolute -inset-1 rounded-full bg-medical-blue-400 animate-pulse opacity-30"></div>
+      </Button>
+    </motion.div>
   );
 };
 
