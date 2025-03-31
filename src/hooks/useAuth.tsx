@@ -1,17 +1,14 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { MongoClient } from 'mongodb';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 
 // This would normally be in an environment variable
-const MONGODB_URI = "mongodb+srv://<username>:<password>@cluster0.mongodb.net/medicaredb";
 const JWT_SECRET = "your_jwt_secret_key";
 
 type User = {
   _id: string;
   name: string;
   email: string;
+  authProvider?: 'email' | 'google';
 };
 
 type AuthContextType = {
@@ -19,6 +16,7 @@ type AuthContextType = {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
+  loginWithGoogle: () => Promise<boolean>;
   register: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
 };
@@ -51,7 +49,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkAuth();
   }, []);
 
-  // In a real application, these functions would connect to MongoDB
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     
@@ -83,7 +80,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const userData = {
         _id: user._id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        authProvider: 'email' as const
       };
       
       localStorage.setItem('user', JSON.stringify(userData));
@@ -92,6 +90,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     } catch (error) {
       console.error('Login error:', error);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loginWithGoogle = async (): Promise<boolean> => {
+    setIsLoading(true);
+    
+    try {
+      // In a real app, we'd use Firebase or another OAuth provider
+      // For this demo, we'll simulate a successful Google login
+      const googleUser = {
+        _id: `google_user_${Date.now()}`,
+        name: "Google User",
+        email: `user_${Date.now()}@gmail.com`,
+        authProvider: 'google' as const
+      };
+      
+      // Check if user already exists
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      
+      // In a real app, we'd check if the email exists in our database
+      // If not, we'd create a new user record
+      
+      // For this demo, let's just add them as a new user if not found
+      const existingUser = users.find((u: any) => u.email === googleUser.email);
+      
+      if (!existingUser) {
+        users.push({
+          _id: googleUser._id,
+          name: googleUser.name,
+          email: googleUser.email,
+          authProvider: 'google',
+          password: null // Google users don't have passwords
+        });
+        localStorage.setItem('users', JSON.stringify(users));
+      }
+      
+      // Create JWT token (simplified)
+      const token = 'simulated_google_jwt_token';
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(googleUser));
+      
+      setUser(googleUser);
+      return true;
+    } catch (error) {
+      console.error('Google login error:', error);
       return false;
     } finally {
       setIsLoading(false);
@@ -117,6 +163,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         name,
         email,
         password, // In a real app, hash the password with bcrypt
+        authProvider: 'email'
       };
       
       // Save to "database"
@@ -145,6 +192,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthenticated: !!user,
         isLoading,
         login,
+        loginWithGoogle,
         register,
         logout
       }}

@@ -20,6 +20,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useAuth } from '@/hooks/useAuth';
+import { Separator } from "@/components/ui/separator";
+import GoogleAuth from '@/components/ui/auth/GoogleAuth';
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -61,6 +63,8 @@ const Auth = () => {
       if (success) {
         toast.success("Logged in successfully!");
         navigate('/');
+      } else {
+        toast.error("Invalid credentials. Please try again.");
       }
     } catch (error) {
       toast.error("Failed to login. Please check your credentials.");
@@ -76,6 +80,8 @@ const Auth = () => {
       const success = await register(values.name, values.email, values.password);
       if (success) {
         toast.success("Account created successfully! Please log in.");
+      } else {
+        toast.error("Email already exists. Please use a different email.");
       }
     } catch (error) {
       toast.error("Failed to create account. Please try again.");
@@ -131,47 +137,60 @@ const Auth = () => {
                   Enter your credentials to access your account
                 </CardDescription>
               </CardHeader>
-              <form onSubmit={loginForm.handleSubmit(onLoginSubmit)}>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input 
-                      id="email" 
-                      type="email" 
-                      placeholder="you@example.com" 
-                      {...loginForm.register("email")} 
-                    />
-                    {loginForm.formState.errors.email && (
-                      <p className="text-sm text-red-500">{loginForm.formState.errors.email.message}</p>
-                    )}
+              <CardContent className="space-y-4">
+                <GoogleAuth />
+                
+                <div className="relative my-4">
+                  <Separator className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </Separator>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">
+                      Or continue with email
+                    </span>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="password">Password</Label>
-                      <Button variant="link" className="p-0 h-auto text-xs">
-                        Forgot password?
-                      </Button>
+                </div>
+                
+                <form onSubmit={loginForm.handleSubmit(onLoginSubmit)}>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input 
+                        id="email" 
+                        type="email" 
+                        placeholder="you@example.com" 
+                        {...loginForm.register("email")} 
+                      />
+                      {loginForm.formState.errors.email && (
+                        <p className="text-sm text-red-500">{loginForm.formState.errors.email.message}</p>
+                      )}
                     </div>
-                    <Input 
-                      id="password" 
-                      type="password" 
-                      {...loginForm.register("password")} 
-                    />
-                    {loginForm.formState.errors.password && (
-                      <p className="text-sm text-red-500">{loginForm.formState.errors.password.message}</p>
-                    )}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="password">Password</Label>
+                        <Button variant="link" className="p-0 h-auto text-xs">
+                          Forgot password?
+                        </Button>
+                      </div>
+                      <Input 
+                        id="password" 
+                        type="password" 
+                        {...loginForm.register("password")} 
+                      />
+                      {loginForm.formState.errors.password && (
+                        <p className="text-sm text-red-500">{loginForm.formState.errors.password.message}</p>
+                      )}
+                    </div>
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-medical-blue-600 hover:bg-medical-blue-700" 
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Logging in..." : "Login"}
+                    </Button>
                   </div>
-                </CardContent>
-                <CardFooter>
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-medical-blue-600 hover:bg-medical-blue-700" 
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Logging in..." : "Login"}
-                  </Button>
-                </CardFooter>
-              </form>
+                </form>
+              </CardContent>
             </Card>
           </TabsContent>
           
@@ -183,53 +202,66 @@ const Auth = () => {
                   Enter your information to create an account
                 </CardDescription>
               </CardHeader>
-              <form onSubmit={signupForm.handleSubmit(onSignupSubmit)}>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input 
-                      id="name" 
-                      placeholder="John Doe" 
-                      {...signupForm.register("name")} 
-                    />
-                    {signupForm.formState.errors.name && (
-                      <p className="text-sm text-red-500">{signupForm.formState.errors.name.message}</p>
-                    )}
+              <CardContent className="space-y-4">
+                <GoogleAuth />
+                
+                <div className="relative my-4">
+                  <Separator className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </Separator>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">
+                      Or continue with email
+                    </span>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
-                    <Input 
-                      id="signup-email" 
-                      type="email" 
-                      placeholder="you@example.com" 
-                      {...signupForm.register("email")} 
-                    />
-                    {signupForm.formState.errors.email && (
-                      <p className="text-sm text-red-500">{signupForm.formState.errors.email.message}</p>
-                    )}
+                </div>
+                
+                <form onSubmit={signupForm.handleSubmit(onSignupSubmit)}>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input 
+                        id="name" 
+                        placeholder="John Doe" 
+                        {...signupForm.register("name")} 
+                      />
+                      {signupForm.formState.errors.name && (
+                        <p className="text-sm text-red-500">{signupForm.formState.errors.name.message}</p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-email">Email</Label>
+                      <Input 
+                        id="signup-email" 
+                        type="email" 
+                        placeholder="you@example.com" 
+                        {...signupForm.register("email")} 
+                      />
+                      {signupForm.formState.errors.email && (
+                        <p className="text-sm text-red-500">{signupForm.formState.errors.email.message}</p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-password">Password</Label>
+                      <Input 
+                        id="signup-password" 
+                        type="password" 
+                        {...signupForm.register("password")} 
+                      />
+                      {signupForm.formState.errors.password && (
+                        <p className="text-sm text-red-500">{signupForm.formState.errors.password.message}</p>
+                      )}
+                    </div>
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-medical-green-600 hover:bg-medical-green-700" 
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Creating Account..." : "Sign Up"}
+                    </Button>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password</Label>
-                    <Input 
-                      id="signup-password" 
-                      type="password" 
-                      {...signupForm.register("password")} 
-                    />
-                    {signupForm.formState.errors.password && (
-                      <p className="text-sm text-red-500">{signupForm.formState.errors.password.message}</p>
-                    )}
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-medical-green-600 hover:bg-medical-green-700" 
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Creating Account..." : "Sign Up"}
-                  </Button>
-                </CardFooter>
-              </form>
+                </form>
+              </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
