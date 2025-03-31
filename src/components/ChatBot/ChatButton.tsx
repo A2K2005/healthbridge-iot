@@ -3,12 +3,15 @@ import React from 'react';
 import { MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ChatButtonProps {
   onClick: () => void;
 }
 
 const ChatButton: React.FC<ChatButtonProps> = ({ onClick }) => {
+  const { isAuthenticated } = useAuth();
+  
   return (
     <motion.div
       initial={{ scale: 0, opacity: 0 }}
@@ -29,7 +32,7 @@ const ChatButton: React.FC<ChatButtonProps> = ({ onClick }) => {
         aria-label="Open AI assistant"
       >
         <MessageSquare className="w-7 h-7 text-white" />
-        <span className="absolute top-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+        <span className={`absolute top-0 right-0 w-3 h-3 ${isAuthenticated ? 'bg-green-500' : 'bg-yellow-500'} rounded-full border-2 border-white`}></span>
         
         <motion.div 
           className="absolute -inset-1 rounded-full bg-medical-blue-400 opacity-30"
