@@ -31,7 +31,18 @@ const ChatButton: React.FC<ChatButtonProps> = ({ onClick }) => {
         <MessageSquare className="w-7 h-7 text-white" />
         <span className="absolute top-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
         
-        <div className="absolute -inset-1 rounded-full bg-medical-blue-400 animate-pulse opacity-30"></div>
+        <motion.div 
+          className="absolute -inset-1 rounded-full bg-medical-blue-400 opacity-30"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.2, 0.3]
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            repeatType: "loop"
+          }}
+        />
       </Button>
     </motion.div>
   );

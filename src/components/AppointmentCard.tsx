@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import BlurEffect from './BlurEffect';
 import { Calendar as CalendarIcon, Clock, User, Stethoscope } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -11,6 +10,11 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { toast } from 'sonner';
+import { 
+  saveAppointment, 
+  isSlotBooked, 
+  AppointmentDetails 
+} from '@/utils/appointmentStorage';
 
 const AppointmentCard: React.FC = () => {
   const [activeStep, setActiveStep] = useState(1);
@@ -18,17 +22,66 @@ const AppointmentCard: React.FC = () => {
   const [selectedTime, setSelectedTime] = useState<string>("10:30 AM");
   const [selectedDoctor, setSelectedDoctor] = useState<string>("Dr. Aisha Sharma");
   const [selectedType, setSelectedType] = useState<string>("General Checkup");
+  const [patientName, setPatientName] = useState<string>("");
+  const [patientEmail, setPatientEmail] = useState<string>("");
+  const [notes, setNotes] = useState<string>("");
+  const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>(['9:00 AM', '10:30 AM', '11:45 AM', '2:00 PM', '3:15 PM', '4:30 PM']);
+  
+  useEffect(() => {
+    if (selectedDate) {
+      const allTimeSlots = ['9:00 AM', '10:30 AM', '11:45 AM', '2:00 PM', '3:15 PM', '4:30 PM'];
+      const available = allTimeSlots.filter(time => !isSlotBooked(selectedDate, time));
+      setAvailableTimeSlots(available);
+      
+      if (available.length > 0 && !available.includes(selectedTime)) {
+        setSelectedTime(available[0]);
+      }
+    }
+  }, [selectedDate, selectedTime]);
   
   const handleNext = () => {
-    if (activeStep < 3) {
-      setActiveStep(activeStep + 1);
-    } else {
-      // Handle appointment booking completion
+    if (activeStep === 1) {
+      if (!selectedDate || !selectedTime) {
+        toast.error("Please select both date and time for your appointment");
+        return;
+      }
+      setActiveStep(2);
+    } else if (activeStep === 2) {
+      if (!selectedDoctor || !selectedType) {
+        toast.error("Please select doctor and appointment type");
+        return;
+      }
+      setActiveStep(3);
+    } else if (activeStep === 3) {
+      if (!patientName) {
+        toast.error("Please enter your name");
+        return;
+      }
+      
+      const appointment: AppointmentDetails = {
+        date: selectedDate!,
+        time: selectedTime,
+        doctor: selectedDoctor,
+        type: selectedType,
+        notes,
+        patientName,
+        patientEmail
+      };
+      
+      saveAppointment(appointment);
+      
       toast.success("Appointment booked successfully!", {
         description: `Your appointment with ${selectedDoctor} is scheduled for ${format(selectedDate || new Date(), 'EEEE, MMM d, yyyy')} at ${selectedTime}`,
       });
-      // Reset form
+      
       setActiveStep(1);
+      setSelectedDate(new Date());
+      setSelectedTime("10:30 AM");
+      setSelectedDoctor("Dr. Aisha Sharma");
+      setSelectedType("General Checkup");
+      setPatientName("");
+      setPatientEmail("");
+      setNotes("");
     }
   };
   
@@ -38,8 +91,6 @@ const AppointmentCard: React.FC = () => {
     }
   };
 
-  const timeSlots = ['9:00 AM', '10:30 AM', '11:45 AM', '2:00 PM', '3:15 PM', '4:30 PM'];
-  
   return (
     <section id="appointments" className="section-container bg-medical-blue-50 overflow-hidden">
       <div className="max-w-7xl mx-auto">
@@ -154,6 +205,7 @@ const AppointmentCard: React.FC = () => {
                               mode="single"
                               selected={selectedDate}
                               onSelect={setSelectedDate}
+                              disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                               className="border rounded-md pointer-events-auto"
                             />
                           </PopoverContent>
@@ -164,21 +216,27 @@ const AppointmentCard: React.FC = () => {
                     <div className="space-y-2">
                       <label className="block text-sm font-medium text-gray-700">Available Time Slots</label>
                       <div className="grid grid-cols-3 gap-2">
-                        {timeSlots.map((time, i) => (
-                          <motion.button 
-                            key={i}
-                            className={`py-2 px-1 rounded-lg text-sm font-medium transition-colors ${
-                              time === selectedTime 
-                                ? 'bg-medical-blue-100 text-medical-blue-600 border-2 border-medical-blue-500' 
-                                : 'bg-white border border-gray-200 text-gray-600 hover:bg-medical-blue-50'
-                            }`}
-                            onClick={() => setSelectedTime(time)}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                          >
-                            {time}
-                          </motion.button>
-                        ))}
+                        {availableTimeSlots.length > 0 ? (
+                          availableTimeSlots.map((time, i) => (
+                            <motion.button 
+                              key={i}
+                              className={`py-2 px-1 rounded-lg text-sm font-medium transition-colors ${
+                                time === selectedTime 
+                                  ? 'bg-medical-blue-100 text-medical-blue-600 border-2 border-medical-blue-500' 
+                                  : 'bg-white border border-gray-200 text-gray-600 hover:bg-medical-blue-50'
+                              }`}
+                              onClick={() => setSelectedTime(time)}
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              {time}
+                            </motion.button>
+                          ))
+                        ) : (
+                          <p className="col-span-3 text-center py-3 bg-gray-50 text-gray-500 rounded-lg">
+                            No slots available for selected date
+                          </p>
+                        )}
                       </div>
                     </div>
                   </motion.div>
@@ -267,6 +325,31 @@ const AppointmentCard: React.FC = () => {
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.3 }}
                   >
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Your Name*</label>
+                        <input
+                          type="text"
+                          value={patientName}
+                          onChange={(e) => setPatientName(e.target.value)}
+                          placeholder="Enter your full name"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-medical-blue-500 focus:border-medical-blue-500"
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Email (Optional)</label>
+                        <input
+                          type="email"
+                          value={patientEmail}
+                          onChange={(e) => setPatientEmail(e.target.value)}
+                          placeholder="Enter your email address"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-medical-blue-500 focus:border-medical-blue-500"
+                        />
+                      </div>
+                    </div>
+                    
                     <div className="p-4 bg-medical-blue-50 rounded-lg border border-medical-blue-100">
                       <h4 className="font-medium text-medical-blue-800 mb-3">Appointment Summary</h4>
                       
@@ -316,6 +399,8 @@ const AppointmentCard: React.FC = () => {
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-medical-blue-500 focus:border-medical-blue-500 resize-none"
                         rows={3}
                         placeholder="Add any specific concerns or symptoms you'd like to discuss..."
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
                       ></textarea>
                     </div>
                   </motion.div>
