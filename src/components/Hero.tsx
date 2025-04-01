@@ -1,8 +1,8 @@
+
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
-import MedicalInterfaceCard from './MedicalInterfaceCard';
 
 const Hero: React.FC = () => {
   const { theme } = useTheme();
@@ -129,7 +129,146 @@ const Hero: React.FC = () => {
           </div>
           
           <div className="md:w-1/2 flex justify-center md:justify-end">
-            <MedicalInterfaceCard />
+            <motion.div 
+              className="relative"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                duration: 0.8,
+                delay: 0.3,
+                type: "spring",
+                stiffness: 100
+              }}
+              whileHover={{
+                y: -10,
+                transition: { duration: 0.5 }
+              }}
+            >
+              <motion.div 
+                className="relative z-10 glass-effect dark:bg-gray-800/70 dark:backdrop-blur-xl dark:border-gray-700/30 rounded-2xl overflow-hidden p-2 shadow-2xl"
+                animate={{ boxShadow: theme === 'dark' 
+                  ? ['0 10px 25px rgba(0, 0, 0, 0.3)', '0 10px 35px rgba(0, 100, 255, 0.1)', '0 10px 25px rgba(0, 0, 0, 0.3)'] 
+                  : ['0 10px 25px rgba(0, 0, 0, 0.1)', '0 10px 35px rgba(0, 100, 255, 0.2)', '0 10px 25px rgba(0, 0, 0, 0.1)'] 
+                }}
+                transition={{ 
+                  duration: 3, 
+                  repeat: Infinity, 
+                  repeatType: 'reverse' 
+                }}
+              >
+                <div className="aspect-square w-full max-w-md rounded-xl overflow-hidden bg-medical-blue-50 dark:bg-medical-blue-900/30">
+                  <motion.div 
+                    className="w-full h-full bg-gradient-to-br from-medical-blue-400 to-medical-green-400 dark:from-medical-blue-700 dark:to-medical-green-700 opacity-80 flex items-center justify-center"
+                    animate={{
+                      background: theme === 'dark'
+                        ? ['linear-gradient(135deg, rgba(23,97,176,0.8) 0%, rgba(15,119,84,0.8) 100%)', 'linear-gradient(225deg, rgba(23,97,176,0.8) 0%, rgba(15,119,84,0.8) 100%)']
+                        : ['linear-gradient(135deg, rgba(56,189,248,0.8) 0%, rgba(52,211,153,0.8) 100%)', 'linear-gradient(225deg, rgba(56,189,248,0.8) 0%, rgba(52,211,153,0.8) 100%)']
+                    }}
+                    transition={{ duration: 8, repeat: Infinity, repeatType: 'reverse' }}
+                  >
+                    <div className="text-center p-10">
+                      <motion.div 
+                        className="w-16 h-16 mx-auto mb-6 rounded-full bg-white/90 dark:bg-white/80 flex items-center justify-center hero-pulse"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ 
+                          type: "spring",
+                          stiffness: 200,
+                          delay: 1,
+                          duration: 0.8
+                        }}
+                        style={{ transition: 'transform 0.5s ease-out' }}
+                      >
+                        <svg className="w-8 h-8 text-medical-blue-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+                        </svg>
+                      </motion.div>
+                      <motion.h3 
+                        className="text-white text-xl font-bold mb-2"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 1.2, duration: 0.5 }}
+                      >
+                        Medical Care Interface
+                      </motion.h3>
+                      <motion.p 
+                        className="text-white/80"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 1.4, duration: 0.5 }}
+                      >
+                        Your health is our priority. Experience seamless healthcare with cutting-edge technology.
+                      </motion.p>
+                      
+                      {/* Added floating icons around the card */}
+                      <motion.div 
+                        className="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"
+                        animate={{
+                          y: [0, -10, 0],
+                          opacity: [0.5, 1, 0.5],
+                        }}
+                        transition={{
+                          duration: 3,
+                          repeat: Infinity,
+                          repeatType: 'reverse'
+                        }}
+                      >
+                        <svg className="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M8 16H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"></path>
+                          <path d="M16 8h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2v-2"></path>
+                        </svg>
+                      </motion.div>
+                      
+                      <motion.div 
+                        className="absolute bottom-5 left-5 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"
+                        animate={{
+                          y: [0, 10, 0],
+                          opacity: [0.5, 1, 0.5],
+                        }}
+                        transition={{
+                          duration: 4,
+                          repeat: Infinity,
+                          repeatType: 'reverse',
+                          delay: 0.5
+                        }}
+                      >
+                        <svg className="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M9 12h6"></path>
+                          <path d="M12 9v6"></path>
+                          <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z"></path>
+                        </svg>
+                      </motion.div>
+                    </div>
+                  </motion.div>
+                </div>
+              </motion.div>
+              
+              <motion.div 
+                className="absolute -bottom-6 -right-6 w-48 h-48 bg-medical-green-200 dark:bg-medical-green-900/30 rounded-full blur-2xl opacity-50"
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.5, 0.7, 0.5],
+                }}
+                transition={{
+                  duration: 8,
+                  repeat: Infinity,
+                  repeatType: "reverse"
+                }}
+              />
+              <motion.div 
+                className="absolute -top-6 -left-6 w-48 h-48 bg-medical-blue-200 dark:bg-medical-blue-900/30 rounded-full blur-2xl opacity-50"
+                animate={{
+                  scale: [1, 1.3, 1],
+                  opacity: [0.5, 0.6, 0.5],
+                }}
+                transition={{
+                  duration: 10,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  delay: 1
+                }}
+              />
+            </motion.div>
           </div>
         </div>
       </div>
