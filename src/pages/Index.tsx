@@ -8,7 +8,6 @@ import EmergencyTracking from '../components/EmergencyTracking';
 import MentalHealthSupport from '../components/MentalHealthSupport';
 import Footer from '../components/Footer';
 import ChatBot from '../components/ChatBot/ChatBot';
-import FeatureLock from '../components/FeatureLock';
 
 const Index: React.FC = () => {
   // Smooth scroll to section when clicking navigation links
@@ -56,28 +55,13 @@ const Index: React.FC = () => {
         <Hero />
         <Features />
         <section id="appointments">
-          <FeatureLock
-            title="Book an Appointment"
-            description="Sign in to schedule appointments with campus medical professionals"
-          >
-            <AppointmentCard />
-          </FeatureLock>
+          <AppointmentCard />
         </section>
         <section id="emergency">
-          <FeatureLock
-            title="Emergency Services"
-            description="Sign in to access emergency medical assistance and ambulance tracking"
-          >
-            <EmergencyTracking />
-          </FeatureLock>
+          <EmergencyTracking />
         </section>
         <section id="mental-health">
-          <FeatureLock
-            title="Mental Health Support"
-            description="Sign in to access mental wellness resources and counseling services"
-          >
-            <MentalHealthSupport />
-          </FeatureLock>
+          <MentalHealthSupport />
         </section>
       </main>
       <Footer />

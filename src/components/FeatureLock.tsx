@@ -1,4 +1,3 @@
-
 import React, { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -10,12 +9,16 @@ interface FeatureLockProps {
   children: ReactNode;
   title?: string;
   description?: string;
+  showLock?: boolean; // Whether to show the lock UI or just check auth
+  onlyLockSubmit?: boolean; // Whether to render children and only lock submit actions
 }
 
 const FeatureLock: React.FC<FeatureLockProps> = ({ 
   children, 
   title = "Sign in Required", 
-  description = "Please sign in to access this feature" 
+  description = "Please sign in to access this feature",
+  showLock = true,
+  onlyLockSubmit = false
 }) => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -24,10 +27,17 @@ const FeatureLock: React.FC<FeatureLockProps> = ({
     navigate('/auth');
   };
 
-  if (isAuthenticated) {
+  // If user is authenticated, or we're only locking submits, render children
+  if (isAuthenticated || onlyLockSubmit) {
     return <>{children}</>;
   }
 
+  // If showLock is false, just return null (e.g., for hiding elements)
+  if (!showLock) {
+    return null;
+  }
+
+  // Otherwise, show the lock UI
   return (
     <motion.div 
       className="w-full h-full min-h-[300px] rounded-xl bg-gray-50 border border-gray-200 flex flex-col items-center justify-center p-8 text-center"

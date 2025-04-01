@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import BlurEffect from './BlurEffect';
 import { Calendar as CalendarIcon, Clock, User, Stethoscope } from 'lucide-react';
@@ -15,6 +16,8 @@ import {
   isSlotBooked, 
   AppointmentDetails 
 } from '@/utils/appointmentStorage';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 const AppointmentCard: React.FC = () => {
   const [activeStep, setActiveStep] = useState(1);
@@ -26,6 +29,9 @@ const AppointmentCard: React.FC = () => {
   const [patientEmail, setPatientEmail] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
   const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>(['9:00 AM', '10:30 AM', '11:45 AM', '2:00 PM', '3:15 PM', '4:30 PM']);
+  
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   
   useEffect(() => {
     if (selectedDate) {
@@ -55,6 +61,13 @@ const AppointmentCard: React.FC = () => {
     } else if (activeStep === 3) {
       if (!patientName) {
         toast.error("Please enter your name");
+        return;
+      }
+      
+      // Check authentication before submitting
+      if (!isAuthenticated) {
+        toast.error("Please sign in to complete your booking");
+        navigate('/auth');
         return;
       }
       
@@ -391,6 +404,15 @@ const AppointmentCard: React.FC = () => {
                           <span className="text-sm font-medium">{selectedType}</span>
                         </div>
                       </div>
+                      
+                      {!isAuthenticated && (
+                        <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                          <p className="text-sm text-amber-700 flex items-center">
+                            <Lock className="h-4 w-4 mr-2" />
+                            You'll need to sign in to complete your booking
+                          </p>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="space-y-2">
@@ -430,7 +452,7 @@ const AppointmentCard: React.FC = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    {activeStep === 3 ? 'Confirm Booking' : 'Continue'}
+                    {activeStep === 3 ? (isAuthenticated ? 'Confirm Booking' : 'Sign In & Book') : 'Continue'}
                   </motion.button>
                 </div>
               </div>
