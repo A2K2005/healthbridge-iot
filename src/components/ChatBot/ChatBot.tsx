@@ -9,14 +9,24 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import ChatInterface from './ChatInterface';
-import { Bot, X } from 'lucide-react';
+import { Bot, X, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/hooks/useAuth';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const ChatBot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
+  };
+
+  const handleLogin = () => {
+    setIsOpen(false);
+    navigate('/auth');
   };
 
   return (
@@ -38,7 +48,9 @@ const ChatBot: React.FC = () => {
                 <div>
                   <DialogTitle className="text-xl font-bold">TIET Medi-Care Assistant</DialogTitle>
                   <DialogDescription className="text-sm text-gray-600">
-                    Ask me anything about healthcare services
+                    {isAuthenticated 
+                      ? "Ask me anything about healthcare services" 
+                      : "Basic information available. Sign in for full access"}
                   </DialogDescription>
                 </div>
               </div>
@@ -51,7 +63,27 @@ const ChatBot: React.FC = () => {
               </button>
             </div>
           </DialogHeader>
-          <ChatInterface isOpen={isOpen} />
+          
+          {isAuthenticated ? (
+            <ChatInterface isOpen={isOpen} />
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                <Lock className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Enhanced Support</h3>
+              <p className="text-gray-600 mb-6">
+                Sign in to access personalized medical assistance, appointment scheduling, 
+                and detailed health information.
+              </p>
+              <Button 
+                onClick={handleLogin}
+                className="bg-medical-blue-600 hover:bg-medical-blue-700"
+              >
+                Sign In for Full Access
+              </Button>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </>
