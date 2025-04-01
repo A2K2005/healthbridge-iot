@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import BlurEffect from './BlurEffect';
-import { Calendar as CalendarIcon, Clock, User, Stethoscope } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, User, Stethoscope, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
@@ -64,7 +63,6 @@ const AppointmentCard: React.FC = () => {
         return;
       }
       
-      // Check authentication before submitting
       if (!isAuthenticated) {
         toast.error("Please sign in to complete your booking");
         navigate('/auth');
