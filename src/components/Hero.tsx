@@ -1,10 +1,12 @@
 
 import React, { useEffect } from 'react';
-import BlurEffect from './BlurEffect';
 import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
+import { useTheme } from '@/hooks/useTheme';
 
 const Hero: React.FC = () => {
+  const { theme } = useTheme();
+  
   useEffect(() => {
     const interval = setInterval(() => {
       const pulseElements = document.querySelectorAll('.hero-pulse');
@@ -20,10 +22,10 @@ const Hero: React.FC = () => {
   }, []);
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-white to-medical-blue-50 pt-20">
+    <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-white to-medical-blue-50 dark:from-gray-900 dark:to-gray-800 pt-20">
       <div className="absolute inset-0 overflow-hidden">
         <motion.div 
-          className="absolute -bottom-16 -right-16 w-80 h-80 bg-medical-blue-300/30 rounded-full blur-3xl"
+          className="absolute -bottom-16 -right-16 w-80 h-80 bg-medical-blue-300/30 dark:bg-medical-blue-700/20 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.05, 1],
             opacity: [0.5, 0.7, 0.5],
@@ -35,7 +37,7 @@ const Hero: React.FC = () => {
           }}
         />
         <motion.div 
-          className="absolute top-40 -left-20 w-80 h-80 bg-medical-green-300/20 rounded-full blur-3xl"
+          className="absolute top-40 -left-20 w-80 h-80 bg-medical-green-300/20 dark:bg-medical-green-700/20 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.1, 1],
             opacity: [0.3, 0.5, 0.3],
@@ -58,7 +60,7 @@ const Hero: React.FC = () => {
               transition={{ duration: 0.6 }}
               className="mb-4"
             >
-              <span className="inline-block px-4 py-1.5 rounded-full bg-medical-blue-100 text-medical-blue-700 font-medium text-sm mb-4">
+              <span className="inline-block px-4 py-1.5 rounded-full bg-medical-blue-100 dark:bg-medical-blue-900/50 text-medical-blue-700 dark:text-medical-blue-300 font-medium text-sm mb-4">
                 Next Generation Healthcare
               </span>
             </motion.div>
@@ -69,10 +71,10 @@ const Hero: React.FC = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="mb-6"
             >
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight dark:text-white">
                 TIET Medi-Care
                 <motion.span 
-                  className="block text-medical-blue-600"
+                  className="block text-medical-blue-600 dark:text-medical-blue-400"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, delay: 0.6 }}
@@ -96,7 +98,7 @@ const Hero: React.FC = () => {
               transition={{ duration: 0.6, delay: 0.4 }}
               className="mb-10"
             >
-              <p className="text-lg text-gray-600 max-w-lg">
+              <p className="text-lg text-gray-600 dark:text-gray-300 max-w-lg">
                 A secure, AI-driven healthcare platform with IoT integration, designed to provide students and staff with seamless medical services and emergency assistance.
               </p>
             </motion.div>
@@ -109,7 +111,7 @@ const Hero: React.FC = () => {
             >
               <motion.a 
                 href="#features" 
-                className="btn-primary"
+                className="btn-primary dark:bg-medical-blue-600 dark:hover:bg-medical-blue-700"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -117,7 +119,7 @@ const Hero: React.FC = () => {
               </motion.a>
               <motion.a 
                 href="#appointments" 
-                className="btn-outline"
+                className="btn-outline dark:border-medical-blue-400 dark:text-medical-blue-400 dark:hover:bg-medical-blue-900/30"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -137,13 +139,36 @@ const Hero: React.FC = () => {
                 type: "spring",
                 stiffness: 100
               }}
+              whileHover={{
+                y: -10,
+                transition: { duration: 0.5 }
+              }}
             >
-              <div className="relative z-10 glass-effect rounded-2xl overflow-hidden p-2 shadow-2xl">
-                <div className="aspect-square w-full max-w-md rounded-xl overflow-hidden bg-medical-blue-50">
-                  <div className="w-full h-full bg-gradient-to-br from-medical-blue-400 to-medical-green-400 opacity-80 flex items-center justify-center">
+              <motion.div 
+                className="relative z-10 glass-effect dark:bg-gray-800/70 dark:backdrop-blur-xl dark:border-gray-700/30 rounded-2xl overflow-hidden p-2 shadow-2xl"
+                animate={{ boxShadow: theme === 'dark' 
+                  ? ['0 10px 25px rgba(0, 0, 0, 0.3)', '0 10px 35px rgba(0, 100, 255, 0.1)', '0 10px 25px rgba(0, 0, 0, 0.3)'] 
+                  : ['0 10px 25px rgba(0, 0, 0, 0.1)', '0 10px 35px rgba(0, 100, 255, 0.2)', '0 10px 25px rgba(0, 0, 0, 0.1)'] 
+                }}
+                transition={{ 
+                  duration: 3, 
+                  repeat: Infinity, 
+                  repeatType: 'reverse' 
+                }}
+              >
+                <div className="aspect-square w-full max-w-md rounded-xl overflow-hidden bg-medical-blue-50 dark:bg-medical-blue-900/30">
+                  <motion.div 
+                    className="w-full h-full bg-gradient-to-br from-medical-blue-400 to-medical-green-400 dark:from-medical-blue-700 dark:to-medical-green-700 opacity-80 flex items-center justify-center"
+                    animate={{
+                      background: theme === 'dark'
+                        ? ['linear-gradient(135deg, rgba(23,97,176,0.8) 0%, rgba(15,119,84,0.8) 100%)', 'linear-gradient(225deg, rgba(23,97,176,0.8) 0%, rgba(15,119,84,0.8) 100%)']
+                        : ['linear-gradient(135deg, rgba(56,189,248,0.8) 0%, rgba(52,211,153,0.8) 100%)', 'linear-gradient(225deg, rgba(56,189,248,0.8) 0%, rgba(52,211,153,0.8) 100%)']
+                    }}
+                    transition={{ duration: 8, repeat: Infinity, repeatType: 'reverse' }}
+                  >
                     <div className="text-center p-10">
                       <motion.div 
-                        className="w-16 h-16 mx-auto mb-6 rounded-full bg-white/90 flex items-center justify-center hero-pulse"
+                        className="w-16 h-16 mx-auto mb-6 rounded-full bg-white/90 dark:bg-white/80 flex items-center justify-center hero-pulse"
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ 
@@ -174,13 +199,52 @@ const Hero: React.FC = () => {
                       >
                         Your health is our priority. Experience seamless healthcare with cutting-edge technology.
                       </motion.p>
+                      
+                      {/* Added floating icons around the card */}
+                      <motion.div 
+                        className="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"
+                        animate={{
+                          y: [0, -10, 0],
+                          opacity: [0.5, 1, 0.5],
+                        }}
+                        transition={{
+                          duration: 3,
+                          repeat: Infinity,
+                          repeatType: 'reverse'
+                        }}
+                      >
+                        <svg className="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M8 16H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"></path>
+                          <path d="M16 8h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2v-2"></path>
+                        </svg>
+                      </motion.div>
+                      
+                      <motion.div 
+                        className="absolute bottom-5 left-5 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"
+                        animate={{
+                          y: [0, 10, 0],
+                          opacity: [0.5, 1, 0.5],
+                        }}
+                        transition={{
+                          duration: 4,
+                          repeat: Infinity,
+                          repeatType: 'reverse',
+                          delay: 0.5
+                        }}
+                      >
+                        <svg className="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M9 12h6"></path>
+                          <path d="M12 9v6"></path>
+                          <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z"></path>
+                        </svg>
+                      </motion.div>
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
-              </div>
+              </motion.div>
               
               <motion.div 
-                className="absolute -bottom-6 -right-6 w-48 h-48 bg-medical-green-200 rounded-full blur-2xl opacity-50"
+                className="absolute -bottom-6 -right-6 w-48 h-48 bg-medical-green-200 dark:bg-medical-green-900/30 rounded-full blur-2xl opacity-50"
                 animate={{
                   scale: [1, 1.2, 1],
                   opacity: [0.5, 0.7, 0.5],
@@ -192,7 +256,7 @@ const Hero: React.FC = () => {
                 }}
               />
               <motion.div 
-                className="absolute -top-6 -left-6 w-48 h-48 bg-medical-blue-200 rounded-full blur-2xl opacity-50"
+                className="absolute -top-6 -left-6 w-48 h-48 bg-medical-blue-200 dark:bg-medical-blue-900/30 rounded-full blur-2xl opacity-50"
                 animate={{
                   scale: [1, 1.3, 1],
                   opacity: [0.5, 0.6, 0.5],
@@ -221,11 +285,11 @@ const Hero: React.FC = () => {
         }}
         onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
       >
-        <span className="text-sm text-gray-600 mb-2">Scroll Down</span>
-        <ChevronDown className="w-5 h-5 text-medical-blue-500" />
+        <span className="text-sm text-gray-600 dark:text-gray-400 mb-2">Scroll Down</span>
+        <ChevronDown className="w-5 h-5 text-medical-blue-500 dark:text-medical-blue-400" />
       </motion.div>
       
-      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white dark:from-gray-900 to-transparent"></div>
     </section>
   );
 };

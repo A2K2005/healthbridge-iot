@@ -8,6 +8,7 @@ import EmergencyTracking from '../components/EmergencyTracking';
 import MentalHealthSupport from '../components/MentalHealthSupport';
 import Footer from '../components/Footer';
 import ChatBot from '../components/ChatBot/ChatBot';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 const Index: React.FC = () => {
   // Smooth scroll to section when clicking navigation links
@@ -50,6 +51,7 @@ const Index: React.FC = () => {
   
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden">
+      <AnimatedBackground />
       <Navbar />
       <main className="flex-grow">
         <Hero />
