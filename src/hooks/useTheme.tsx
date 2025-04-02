@@ -13,6 +13,9 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   // Check local storage for saved theme or use system preference
   const [theme, setTheme] = useState<Theme>(() => {
+    // If we're running server-side, return a default theme
+    if (typeof window === 'undefined') return 'light';
+
     const savedTheme = localStorage.getItem('theme') as Theme;
     if (savedTheme) return savedTheme;
     
@@ -28,15 +31,35 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const root = window.document.documentElement;
     
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
+    // Remove the old theme class first to prevent flickering
+    root.classList.remove('light', 'dark');
+    root.classList.add(theme);
     
     // Save theme preference
     localStorage.setItem('theme', theme);
   }, [theme]);
+
+  // Listen for system preference changes
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleChange = () => {
+      // Only change theme if user hasn't manually set it
+      if (!localStorage.getItem('theme')) {
+        setTheme(mediaQuery.matches ? 'dark' : 'light');
+      }
+    };
+
+    // Some browsers use addEventListener, others use the deprecated addListener
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    } else {
+      // Fallback for Safari and older browsers
+      mediaQuery.addListener(handleChange);
+      return () => mediaQuery.removeListener(handleChange);
+    }
+  }, []);
 
   const toggleTheme = () => {
     setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
