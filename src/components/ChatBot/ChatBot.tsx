@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ChatButton from './ChatButton';
 import {
   Dialog,
@@ -19,6 +19,16 @@ const ChatBot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  
+  // Store the chat state in local storage
+  const [guestMessagesCount, setGuestMessagesCount] = useState(() => {
+    const saved = localStorage.getItem('guestMessagesCount');
+    return saved ? parseInt(saved, 10) : 0;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('guestMessagesCount', guestMessagesCount.toString());
+  }, [guestMessagesCount]);
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
@@ -27,6 +37,11 @@ const ChatBot: React.FC = () => {
   const handleLogin = () => {
     setIsOpen(false);
     navigate('/auth');
+  };
+
+  // Function to increment guest message count
+  const incrementGuestMessageCount = () => {
+    setGuestMessagesCount(prev => prev + 1);
   };
 
   return (
@@ -50,7 +65,7 @@ const ChatBot: React.FC = () => {
                   <DialogDescription className="text-sm text-gray-600">
                     {isAuthenticated 
                       ? "Ask me anything about healthcare services" 
-                      : "Basic information available. Sign in for full access"}
+                      : "Limited access. Sign in for unlimited support"}
                   </DialogDescription>
                 </div>
               </div>
@@ -64,26 +79,13 @@ const ChatBot: React.FC = () => {
             </div>
           </DialogHeader>
           
-          {isAuthenticated ? (
-            <ChatInterface isOpen={isOpen} />
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                <Lock className="w-8 h-8 text-gray-400" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Enhanced Support</h3>
-              <p className="text-gray-600 mb-6">
-                Sign in to access personalized medical assistance, appointment scheduling, 
-                and detailed health information.
-              </p>
-              <Button 
-                onClick={handleLogin}
-                className="bg-medical-blue-600 hover:bg-medical-blue-700"
-              >
-                Sign In for Full Access
-              </Button>
-            </div>
-          )}
+          <ChatInterface 
+            isOpen={isOpen} 
+            isAuthenticated={isAuthenticated} 
+            guestMessagesCount={guestMessagesCount}
+            incrementGuestMessageCount={incrementGuestMessageCount}
+            onLoginRequest={handleLogin}
+          />
         </DialogContent>
       </Dialog>
     </>

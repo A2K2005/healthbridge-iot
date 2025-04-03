@@ -11,6 +11,8 @@ import {
   Lock
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { Button } from './ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const featuresData = [
   {
@@ -53,6 +55,11 @@ const featuresData = [
 
 const Features: React.FC = () => {
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  
+  const handleAuth = () => {
+    navigate('/auth');
+  };
   
   return (
     <section id="features" className="section-container bg-white">
@@ -82,37 +89,50 @@ const Features: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {featuresData.map((feature, index) => (
           <BlurEffect key={index} delay={300 + index * 100} className="card-hover">
-            <div className={`glass-effect rounded-xl p-8 h-full flex flex-col ${feature.requiresAuth && !isAuthenticated ? 'opacity-75' : ''}`}>
-              <div className="mb-6 relative">
+            <div className={`glass-effect rounded-xl p-8 h-full flex flex-col relative ${feature.requiresAuth && !isAuthenticated ? 'border border-gray-200' : ''}`}>
+              {feature.requiresAuth && !isAuthenticated && (
+                <div className="absolute right-4 top-4 flex items-center">
+                  <div className="bg-medical-blue-50 text-medical-blue-600 text-xs font-medium px-3 py-1 rounded-full border border-medical-blue-100 flex items-center gap-1">
+                    <Lock className="w-3 h-3" />
+                    <span>Sign in required</span>
+                  </div>
+                </div>
+              )}
+              
+              <div className="mb-6">
                 <div className="w-16 h-16 rounded-lg bg-medical-blue-50 flex items-center justify-center">
                   {feature.icon}
                 </div>
-                {feature.requiresAuth && !isAuthenticated && (
-                  <div className="absolute -top-2 -right-2 bg-gray-100 rounded-full p-1">
-                    <Lock className="w-4 h-4 text-gray-500" />
-                  </div>
-                )}
               </div>
-              <h3 className="text-xl font-bold mb-3 flex items-center gap-2">
+              <h3 className="text-xl font-bold mb-3">
                 {feature.title}
-                {feature.requiresAuth && !isAuthenticated && (
-                  <span className="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                    Sign in required
-                  </span>
-                )}
               </h3>
               <p className="text-gray-600 flex-grow">{feature.description}</p>
               <div className="mt-6">
-                <a 
-                  href={feature.requiresAuth && !isAuthenticated ? "/auth" : "#"} 
-                  className="inline-flex items-center text-medical-blue-600 font-medium hover:text-medical-blue-700 transition-colors"
-                >
-                  {feature.requiresAuth && !isAuthenticated ? "Sign in to access" : "Learn more"}
-                  <svg className="ml-2 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14"></path>
-                    <path d="m12 5 7 7-7 7"></path>
-                  </svg>
-                </a>
+                {feature.requiresAuth && !isAuthenticated ? (
+                  <Button 
+                    onClick={handleAuth}
+                    variant="outline"
+                    className="text-medical-blue-600 border-medical-blue-200 hover:bg-medical-blue-50"
+                  >
+                    Sign in to access
+                    <svg className="ml-2 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14"></path>
+                      <path d="m12 5 7 7-7 7"></path>
+                    </svg>
+                  </Button>
+                ) : (
+                  <a 
+                    href="#" 
+                    className="inline-flex items-center text-medical-blue-600 font-medium hover:text-medical-blue-700 transition-colors"
+                  >
+                    Learn more
+                    <svg className="ml-2 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14"></path>
+                      <path d="m12 5 7 7-7 7"></path>
+                    </svg>
+                  </a>
+                )}
               </div>
             </div>
           </BlurEffect>

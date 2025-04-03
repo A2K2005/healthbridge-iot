@@ -2,8 +2,30 @@
 import React from 'react';
 import BlurEffect from './BlurEffect';
 import { Brain, BookOpen, Users, MessageSquare } from 'lucide-react';
+import { Button } from './ui/button';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
-const MentalHealthSupport: React.FC = () => {
+interface MentalHealthSupportProps {
+  toggleChat?: () => void;
+}
+
+const MentalHealthSupport: React.FC<MentalHealthSupportProps> = ({ toggleChat }) => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const handleAuthRequired = () => {
+    navigate('/auth');
+  };
+  
+  const handleChatNow = () => {
+    // Find the chatbot button in the DOM and simulate a click
+    const chatButton = document.querySelector('button[aria-label="Open AI assistant"]');
+    if (chatButton) {
+      (chatButton as HTMLButtonElement).click();
+    }
+  };
+  
   return (
     <section id="mental-health" className="section-container bg-gradient-to-br from-medical-blue-50 to-white">
       <div className="max-w-7xl mx-auto">
@@ -64,9 +86,21 @@ const MentalHealthSupport: React.FC = () => {
                 </li>
               </ul>
               <div className="mt-auto">
-                <a href="#" className="btn-secondary inline-flex">
-                  Schedule Consultation
-                </a>
+                {isAuthenticated ? (
+                  <Button 
+                    onClick={() => window.location.href = '#appointments'}
+                    className="bg-medical-green-600 hover:bg-medical-green-700 text-white"
+                  >
+                    Schedule Consultation
+                  </Button>
+                ) : (
+                  <Button 
+                    onClick={handleAuthRequired}
+                    className="bg-medical-green-600 hover:bg-medical-green-700 text-white"
+                  >
+                    Sign in to Schedule
+                  </Button>
+                )}
               </div>
             </div>
           </BlurEffect>
@@ -101,9 +135,13 @@ const MentalHealthSupport: React.FC = () => {
                 </div>
               </div>
               <div className="mt-auto">
-                <a href="#" className="btn-outline inline-flex">
+                <Button
+                  variant="outline"
+                  onClick={() => window.open("https://www.thapar.edu/health", "_blank")}
+                  className="border-medical-blue-200 text-medical-blue-600 hover:bg-medical-blue-50"
+                >
                   Browse Resources
-                </a>
+                </Button>
               </div>
             </div>
           </BlurEffect>
@@ -149,9 +187,23 @@ const MentalHealthSupport: React.FC = () => {
                 </div>
               </div>
               <div className="mt-auto">
-                <a href="#" className="btn-outline inline-flex">
-                  Join a Group
-                </a>
+                {isAuthenticated ? (
+                  <Button
+                    variant="outline"
+                    onClick={() => window.location.href = "#appointments"}
+                    className="border-medical-blue-200 text-medical-blue-600 hover:bg-medical-blue-50"
+                  >
+                    Join a Group
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    onClick={handleAuthRequired}
+                    className="border-medical-blue-200 text-medical-blue-600 hover:bg-medical-blue-50"
+                  >
+                    Sign in to Join
+                  </Button>
+                )}
               </div>
             </div>
           </BlurEffect>
@@ -207,9 +259,12 @@ const MentalHealthSupport: React.FC = () => {
               </div>
               
               <div className="mt-auto">
-                <a href="#" className="btn-secondary inline-flex">
+                <Button
+                  onClick={handleChatNow}
+                  className="bg-medical-green-600 hover:bg-medical-green-700 text-white"
+                >
                   Chat Now
-                </a>
+                </Button>
               </div>
             </div>
           </BlurEffect>

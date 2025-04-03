@@ -1,10 +1,11 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, User, Bot, Clock, Calendar, AlertCircle, Heart, HelpCircle } from 'lucide-react';
+import { Send, User, Bot, Clock, Calendar, AlertCircle, Heart, HelpCircle, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from 'framer-motion';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 interface Message {
   id: string;
@@ -15,9 +16,22 @@ interface Message {
 
 interface ChatInterfaceProps {
   isOpen: boolean;
+  isAuthenticated: boolean;
+  guestMessagesCount: number;
+  incrementGuestMessageCount: () => void;
+  onLoginRequest: () => void;
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen }) => {
+// Maximum number of messages for non-authenticated users
+const MAX_GUEST_MESSAGES = 3;
+
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
+  isOpen, 
+  isAuthenticated, 
+  guestMessagesCount, 
+  incrementGuestMessageCount,
+  onLoginRequest
+}) => {
   const [messages, setMessages] = useState<Message[]>(() => {
     const savedMessages = localStorage.getItem('chatMessages');
     return savedMessages ? JSON.parse(savedMessages) : [
@@ -45,6 +59,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen }) => {
   const handleSendMessage = () => {
     if (input.trim() === '') return;
     
+    // Check if non-authenticated user has reached the message limit
+    if (!isAuthenticated && guestMessagesCount >= MAX_GUEST_MESSAGES) {
+      return;
+    }
+    
     const newMessage: Message = {
       id: Date.now().toString(),
       text: input,
@@ -55,19 +74,37 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen }) => {
     setMessages([...messages, newMessage]);
     setInput('');
     
+    // Increment guest message count if user is not authenticated
+    if (!isAuthenticated) {
+      incrementGuestMessageCount();
+    }
+    
     // Show typing indicator
     setIsTyping(true);
     
     // Simulate bot response after a short delay
     setTimeout(() => {
       setIsTyping(false);
-      const responseMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: getBotResponse(input),
-        isUser: false,
-        timestamp: getTimeString(),
-      };
-      setMessages(prev => [...prev, responseMessage]);
+      
+      // If this was the last allowed message for guest users
+      if (!isAuthenticated && guestMessagesCount + 1 >= MAX_GUEST_MESSAGES) {
+        const limitMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: "You've reached the limit for guest access. Sign in to continue our conversation and access all features.",
+          isUser: false,
+          timestamp: getTimeString(),
+        };
+        setMessages(prev => [...prev, limitMessage]);
+      } else {
+        // Regular response
+        const responseMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: getBotResponse(input),
+          isUser: false,
+          timestamp: getTimeString(),
+        };
+        setMessages(prev => [...prev, responseMessage]);
+      }
     }, 1500);
   };
 
@@ -98,6 +135,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen }) => {
   };
 
   const handleSuggestionClick = (suggestion: string) => {
+    // Check if non-authenticated user has reached the message limit
+    if (!isAuthenticated && guestMessagesCount >= MAX_GUEST_MESSAGES) {
+      return;
+    }
+    
     const newMessage: Message = {
       id: Date.now().toString(),
       text: suggestion,
@@ -107,19 +149,37 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen }) => {
     
     setMessages([...messages, newMessage]);
     
+    // Increment guest message count if user is not authenticated
+    if (!isAuthenticated) {
+      incrementGuestMessageCount();
+    }
+    
     // Show typing indicator
     setIsTyping(true);
     
     // Simulate bot response after a short delay
     setTimeout(() => {
       setIsTyping(false);
-      const responseMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: getBotResponse(suggestion),
-        isUser: false,
-        timestamp: getTimeString(),
-      };
-      setMessages(prev => [...prev, responseMessage]);
+      
+      // If this was the last allowed message for guest users
+      if (!isAuthenticated && guestMessagesCount + 1 >= MAX_GUEST_MESSAGES) {
+        const limitMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: "You've reached the limit for guest access. Sign in to continue our conversation and access all features.",
+          isUser: false,
+          timestamp: getTimeString(),
+        };
+        setMessages(prev => [...prev, limitMessage]);
+      } else {
+        // Regular response
+        const responseMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: getBotResponse(suggestion),
+          isUser: false,
+          timestamp: getTimeString(),
+        };
+        setMessages(prev => [...prev, responseMessage]);
+      }
     }, 1500);
   };
 
@@ -215,6 +275,26 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen }) => {
           )}
         </AnimatePresence>
         
+        {/* Message limit alert for non-authenticated users */}
+        {!isAuthenticated && (
+          <div className="px-3 py-2 mb-2">
+            <Alert className="bg-blue-50 border-blue-100">
+              <Lock className="h-4 w-4 text-blue-500" />
+              <AlertTitle className="text-sm font-semibold text-blue-700">Limited access mode</AlertTitle>
+              <AlertDescription className="text-xs text-blue-600">
+                You have {MAX_GUEST_MESSAGES - guestMessagesCount} message{MAX_GUEST_MESSAGES - guestMessagesCount !== 1 ? 's' : ''} remaining. 
+                <Button 
+                  variant="link" 
+                  className="text-xs p-0 h-auto text-medical-blue-600 hover:text-medical-blue-700 font-semibold" 
+                  onClick={onLoginRequest}
+                >
+                  Sign in for unlimited access
+                </Button>
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
+        
         <div ref={messagesEndRef} />
       </div>
       
@@ -238,60 +318,75 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen }) => {
       
       {/* Input area */}
       <div className="p-4 border-t border-gray-200 bg-white rounded-b-md">
-        <div className="flex gap-2">
-          <Input
-            placeholder="Type your message..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            className="flex-grow bg-gray-50 border-gray-200 focus:ring-medical-blue-400 rounded-full px-4 shadow-sm transition-all duration-300 focus:shadow-md"
-          />
-          <Button 
-            onClick={handleSendMessage} 
-            size="icon"
-            className="rounded-full bg-medical-blue-600 hover:bg-medical-blue-700 transition-all transform hover:scale-105 shadow-sm"
-            disabled={input.trim() === ''}
-          >
-            <Send className="h-4 w-4" />
-          </Button>
-        </div>
-        
-        <div className="flex justify-center mt-3">
-          <div className="flex flex-wrap justify-center gap-2 w-full">
-            <motion.button 
-              className="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors flex items-center text-xs text-gray-700"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleSuggestionClick("Book an appointment")}
+        {/* Show input only if user has remaining messages or is authenticated */}
+        {(isAuthenticated || guestMessagesCount < MAX_GUEST_MESSAGES) ? (
+          <>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Type your message..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                className="flex-grow bg-gray-50 border-gray-200 focus:ring-medical-blue-400 rounded-full px-4 shadow-sm transition-all duration-300 focus:shadow-md"
+              />
+              <Button 
+                onClick={handleSendMessage} 
+                size="icon"
+                className="rounded-full bg-medical-blue-600 hover:bg-medical-blue-700 transition-all transform hover:scale-105 shadow-sm"
+                disabled={input.trim() === ''}
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="flex justify-center mt-3">
+              <div className="flex flex-wrap justify-center gap-2 w-full">
+                <motion.button 
+                  className="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors flex items-center text-xs text-gray-700"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleSuggestionClick("Book an appointment")}
+                >
+                  <Calendar className="w-3 h-3 mr-1" /> Appointments
+                </motion.button>
+                <motion.button 
+                  className="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors flex items-center text-xs text-gray-700"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleSuggestionClick("Emergency services")}
+                >
+                  <AlertCircle className="w-3 h-3 mr-1" /> Emergency
+                </motion.button>
+                <motion.button 
+                  className="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors flex items-center text-xs text-gray-700"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleSuggestionClick("Office hours")}
+                >
+                  <Clock className="w-3 h-3 mr-1" /> Hours
+                </motion.button>
+                <motion.button 
+                  className="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors flex items-center text-xs text-gray-700"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleSuggestionClick("Mental health support")}
+                >
+                  <Heart className="w-3 h-3 mr-1" /> Mental Health
+                </motion.button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-4">
+            <p className="text-sm text-gray-600 mb-3">You've reached the message limit for guest access</p>
+            <Button 
+              onClick={onLoginRequest} 
+              className="bg-medical-blue-600 hover:bg-medical-blue-700"
             >
-              <Calendar className="w-3 h-3 mr-1" /> Appointments
-            </motion.button>
-            <motion.button 
-              className="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors flex items-center text-xs text-gray-700"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleSuggestionClick("Emergency services")}
-            >
-              <AlertCircle className="w-3 h-3 mr-1" /> Emergency
-            </motion.button>
-            <motion.button 
-              className="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors flex items-center text-xs text-gray-700"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleSuggestionClick("Office hours")}
-            >
-              <Clock className="w-3 h-3 mr-1" /> Hours
-            </motion.button>
-            <motion.button 
-              className="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors flex items-center text-xs text-gray-700"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleSuggestionClick("Mental health support")}
-            >
-              <Heart className="w-3 h-3 mr-1" /> Mental Health
-            </motion.button>
+              Sign in for unlimited access
+            </Button>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
