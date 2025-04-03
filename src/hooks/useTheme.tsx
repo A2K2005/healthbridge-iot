@@ -11,15 +11,16 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  // Modify initial theme selection to prioritize light mode
+  // Check local storage for saved theme or use system preference
   const [theme, setTheme] = useState<Theme>(() => {
-    // If we're running server-side, return light theme
-    if (typeof window === 'undefined') return 'light';
-
     const savedTheme = localStorage.getItem('theme') as Theme;
     if (savedTheme) return savedTheme;
     
-    // Default to light mode even if system preference is dark
+    // Check system preference
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+    
     return 'light';
   });
 
@@ -27,15 +28,16 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const root = window.document.documentElement;
     
-    // Remove the old theme class first to prevent flickering
-    root.classList.remove('light', 'dark');
-    root.classList.add(theme);
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
     
     // Save theme preference
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  // Remove system preference listener to enforce light mode as default
   const toggleTheme = () => {
     setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
   };

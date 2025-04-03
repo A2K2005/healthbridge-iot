@@ -9,11 +9,8 @@ import MentalHealthSupport from '../components/MentalHealthSupport';
 import Footer from '../components/Footer';
 import ChatBot from '../components/ChatBot/ChatBot';
 import AnimatedBackground from '../components/AnimatedBackground';
-import { useTheme } from '@/hooks/useTheme';
 
 const Index: React.FC = () => {
-  const { theme } = useTheme();
-  
   // Smooth scroll to section when clicking navigation links
   useEffect(() => {
     const handleHashChange = () => {
@@ -53,19 +50,19 @@ const Index: React.FC = () => {
   }, []);
   
   return (
-    <div className={`min-h-screen flex flex-col overflow-x-hidden transition-colors duration-500 ${theme === 'dark' ? 'bg-gray-900' : ''}`}>
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
       <AnimatedBackground />
       <Navbar />
       <main className="flex-grow">
         <Hero />
         <Features />
-        <section id="appointments" className="transition-colors duration-300 dark:bg-gray-900">
+        <section id="appointments">
           <AppointmentCard />
         </section>
-        <section id="emergency" className="transition-colors duration-300 dark:bg-gray-900">
+        <section id="emergency">
           <EmergencyTracking />
         </section>
-        <section id="mental-health" className="transition-colors duration-300 dark:bg-gray-900">
+        <section id="mental-health">
           <MentalHealthSupport />
         </section>
       </main>
