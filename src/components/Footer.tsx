@@ -9,15 +9,8 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           <div className="space-y-6">
             <div>
-              <a href="#" className="flex items-center">
-                <img 
-                  src="/lovable-uploads/2cfeacff-8566-4348-9478-051f4329f170.png" 
-                  alt="TIET Medi-Care Logo" 
-                  className="h-10 mr-3 bg-white p-1 rounded"
-                />
-                <span className="text-2xl font-bold bg-gradient-to-r from-medical-blue-300 to-medical-green-300 bg-clip-text text-transparent">
-                  TIET Medi-Care
-                </span>
+              <a href="/" className="text-2xl font-bold bg-gradient-to-r from-medical-blue-300 to-medical-green-300 bg-clip-text text-transparent">
+                TIET Medi-Care
               </a>
               <p className="mt-4 text-medical-blue-100">
                 A secure and AI-driven healthcare platform integrated with IoT for the Thapar Institute community.
@@ -41,7 +34,7 @@ const Footer: React.FC = () => {
             <h3 className="text-lg font-bold mb-6">Quick Links</h3>
             <ul className="space-y-4">
               <li>
-                <a href="#" className="text-medical-blue-100 hover:text-white transition-colors">Home</a>
+                <a href="/" className="text-medical-blue-100 hover:text-white transition-colors">Home</a>
               </li>
               <li>
                 <a href="#features" className="text-medical-blue-100 hover:text-white transition-colors">Features</a>

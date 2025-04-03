@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Menu, X, LogIn, LogOut, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -85,28 +86,17 @@ const Navbar: React.FC = () => {
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <div className="flex items-center justify-between h-20">
-          {/* Logo */}
+          {/* Logo - Simplified */}
           <motion.div 
             className="flex items-center"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <a href="#" className="flex items-center">
-              <img 
-                src="/lovable-uploads/2cfeacff-8566-4348-9478-051f4329f170.png" 
-                alt="TIET Medi-Care Logo" 
-                className="h-10 mr-3"
-              />
-              <motion.span 
-                className="text-2xl font-bold bg-gradient-to-r from-medical-blue-600 to-medical-green-500 dark:from-medical-blue-400 dark:to-medical-green-300 bg-clip-text text-transparent"
-                whileHover={{
-                  scale: 1.05,
-                  transition: { duration: 0.2 }
-                }}
-              >
+            <a href="/" className="flex items-center">
+              <span className="text-2xl font-bold bg-gradient-to-r from-medical-blue-600 to-medical-green-500 dark:from-medical-blue-400 dark:to-medical-green-300 bg-clip-text text-transparent">
                 TIET Medi-Care
-              </motion.span>
+              </span>
             </a>
           </motion.div>
           
@@ -120,7 +110,7 @@ const Navbar: React.FC = () => {
             {menuItems.map((item, index) => (
               <motion.a 
                 key={index}
-                href={item === 'Home' ? '#' : `#${item.toLowerCase().replace(' ', '-')}`}
+                href={item === 'Home' ? '/' : `#${item.toLowerCase().replace(' ', '-')}`}
                 className={`relative text-gray-800 dark:text-gray-200 transition-colors font-medium`}
                 variants={itemVariants}
                 whileHover={{ scale: 1.05 }}
@@ -269,7 +259,7 @@ const Navbar: React.FC = () => {
               {menuItems.map((item, index) => (
                 <motion.a 
                   key={index}
-                  href={item === 'Home' ? '#' : `#${item.toLowerCase().replace(' ', '-')}`}
+                  href={item === 'Home' ? '/' : `#${item.toLowerCase().replace(' ', '-')}`}
                   className="block py-3 px-4 font-medium hover:bg-medical-blue-50 dark:hover:bg-gray-800 hover:text-medical-blue-500 dark:hover:text-medical-blue-400 transition-colors rounded-md"
                   onClick={() => setIsMenuOpen(false)}
                   initial={{ x: -20, opacity: 0 }}

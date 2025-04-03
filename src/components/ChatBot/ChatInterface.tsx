@@ -20,11 +20,8 @@ interface ChatInterfaceProps {
   guestMessagesCount: number;
   incrementGuestMessageCount: () => void;
   onLoginRequest: () => void;
-  maxGuestMessages: number; // Added this prop to the interface
+  maxGuestMessages: number;
 }
-
-// We're removing this constant since maxGuestMessages is now a prop
-// const MAX_GUEST_MESSAGES = 3;
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
   isOpen, 
@@ -51,14 +48,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   
   // Save messages to localStorage when they change
   useEffect(() => {
-    localStorage.setItem('chatMessages', JSON.stringify(messages));
+    if (messages.length > 0) {
+      localStorage.setItem('chatMessages', JSON.stringify(messages));
+    }
   }, [messages]);
   
   const getTimeString = () => {
     return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (input.trim() === '') return;
     
     // Check if non-authenticated user has reached the message limit
@@ -73,7 +73,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       timestamp: getTimeString(),
     };
     
-    setMessages([...messages, newMessage]);
+    setMessages(prev => [...prev, newMessage]);
     setInput('');
     
     // Increment guest message count if user is not authenticated
@@ -132,11 +132,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent form submission
       handleSendMessage();
     }
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
+  const handleSuggestionClick = (suggestion: string, e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent default action which might cause page reload
+    
     // Check if non-authenticated user has reached the message limit
     if (!isAuthenticated && guestMessagesCount >= maxGuestMessages) {
       return;
@@ -149,7 +152,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       timestamp: getTimeString(),
     };
     
-    setMessages([...messages, newMessage]);
+    setMessages(prev => [...prev, newMessage]);
     
     // Increment guest message count if user is not authenticated
     if (!isAuthenticated) {
@@ -185,7 +188,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }, 1500);
   };
 
-  const clearChat = () => {
+  const clearChat = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent any navigation
     setMessages([
       {
         id: '1',
@@ -288,7 +292,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 <Button 
                   variant="link" 
                   className="text-xs p-0 h-auto text-medical-blue-600 hover:text-medical-blue-700 font-semibold" 
-                  onClick={onLoginRequest}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onLoginRequest();
+                  }}
                 >
                   Sign in for unlimited access
                 </Button>
@@ -323,7 +330,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         {/* Show input only if user has remaining messages or is authenticated */}
         {(isAuthenticated || guestMessagesCount < maxGuestMessages) ? (
           <>
-            <div className="flex gap-2">
+            <form onSubmit={handleSendMessage} className="flex gap-2">
               <Input
                 placeholder="Type your message..."
                 value={input}
@@ -332,14 +339,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 className="flex-grow bg-gray-50 border-gray-200 focus:ring-medical-blue-400 rounded-full px-4 shadow-sm transition-all duration-300 focus:shadow-md"
               />
               <Button 
-                onClick={handleSendMessage} 
+                type="submit"
                 size="icon"
                 className="rounded-full bg-medical-blue-600 hover:bg-medical-blue-700 transition-all transform hover:scale-105 shadow-sm"
                 disabled={input.trim() === ''}
               >
                 <Send className="h-4 w-4" />
               </Button>
-            </div>
+            </form>
             
             <div className="flex justify-center mt-3">
               <div className="flex flex-wrap justify-center gap-2 w-full">
@@ -347,7 +354,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   className="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors flex items-center text-xs text-gray-700"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => handleSuggestionClick("Book an appointment")}
+                  onClick={(e) => handleSuggestionClick("Book an appointment", e)}
                 >
                   <Calendar className="w-3 h-3 mr-1" /> Appointments
                 </motion.button>
@@ -355,7 +362,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   className="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors flex items-center text-xs text-gray-700"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => handleSuggestionClick("Emergency services")}
+                  onClick={(e) => handleSuggestionClick("Emergency services", e)}
                 >
                   <AlertCircle className="w-3 h-3 mr-1" /> Emergency
                 </motion.button>
@@ -363,7 +370,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   className="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors flex items-center text-xs text-gray-700"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => handleSuggestionClick("Office hours")}
+                  onClick={(e) => handleSuggestionClick("Office hours", e)}
                 >
                   <Clock className="w-3 h-3 mr-1" /> Hours
                 </motion.button>
@@ -371,7 +378,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   className="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors flex items-center text-xs text-gray-700"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => handleSuggestionClick("Mental health support")}
+                  onClick={(e) => handleSuggestionClick("Mental health support", e)}
                 >
                   <Heart className="w-3 h-3 mr-1" /> Mental Health
                 </motion.button>
@@ -382,7 +389,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           <div className="text-center py-4">
             <p className="text-sm text-gray-600 mb-3">You've reached the message limit for guest access</p>
             <Button 
-              onClick={onLoginRequest} 
+              onClick={(e) => {
+                e.preventDefault();
+                onLoginRequest();
+              }} 
               className="bg-medical-blue-600 hover:bg-medical-blue-700"
             >
               Sign in for unlimited access
