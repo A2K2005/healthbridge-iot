@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import Features from '../components/Features';
@@ -11,8 +11,6 @@ import ChatBot from '../components/ChatBot/ChatBot';
 import AnimatedBackground from '../components/AnimatedBackground';
 
 const Index: React.FC = () => {
-  const chatBotRef = useRef<{ toggleChat: () => void } | null>(null);
-
   // Function to toggle chat that can be passed to components
   const toggleChat = () => {
     // Find and click the chat button

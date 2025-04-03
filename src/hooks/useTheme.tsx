@@ -11,17 +11,12 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  // Check local storage for saved theme or use system preference
+  // Always start with light theme
   const [theme, setTheme] = useState<Theme>(() => {
+    // Only check local storage, ignore system preference
     const savedTheme = localStorage.getItem('theme') as Theme;
-    if (savedTheme) return savedTheme;
-    
-    // Check system preference
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
-    }
-    
-    return 'light';
+    // Default to light if no theme is saved
+    return savedTheme === 'dark' ? 'dark' : 'light';
   });
 
   // Apply theme to document

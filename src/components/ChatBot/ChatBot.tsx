@@ -26,6 +26,9 @@ const ChatBot: React.FC = () => {
     return saved ? parseInt(saved, 10) : 0;
   });
 
+  // Maximum number of messages allowed for guest users
+  const maxGuestMessages = 3;
+
   useEffect(() => {
     localStorage.setItem('guestMessagesCount', guestMessagesCount.toString());
   }, [guestMessagesCount]);
@@ -65,7 +68,7 @@ const ChatBot: React.FC = () => {
                   <DialogDescription className="text-sm text-gray-600">
                     {isAuthenticated 
                       ? "Ask me anything about healthcare services" 
-                      : "Limited access. Sign in for unlimited support"}
+                      : `Guest access: ${maxGuestMessages - guestMessagesCount} messages remaining`}
                   </DialogDescription>
                 </div>
               </div>
@@ -85,6 +88,7 @@ const ChatBot: React.FC = () => {
             guestMessagesCount={guestMessagesCount}
             incrementGuestMessageCount={incrementGuestMessageCount}
             onLoginRequest={handleLogin}
+            maxGuestMessages={maxGuestMessages}
           />
         </DialogContent>
       </Dialog>

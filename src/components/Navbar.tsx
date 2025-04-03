@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Menu, X, LogIn, LogOut, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -94,6 +93,11 @@ const Navbar: React.FC = () => {
             transition={{ duration: 0.5 }}
           >
             <a href="#" className="flex items-center">
+              <img 
+                src="/lovable-uploads/2cfeacff-8566-4348-9478-051f4329f170.png" 
+                alt="TIET Medi-Care Logo" 
+                className="h-10 mr-3"
+              />
               <motion.span 
                 className="text-2xl font-bold bg-gradient-to-r from-medical-blue-600 to-medical-green-500 dark:from-medical-blue-400 dark:to-medical-green-300 bg-clip-text text-transparent"
                 whileHover={{

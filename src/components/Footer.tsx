@@ -10,6 +10,11 @@ const Footer: React.FC = () => {
           <div className="space-y-6">
             <div>
               <a href="#" className="flex items-center">
+                <img 
+                  src="/lovable-uploads/2cfeacff-8566-4348-9478-051f4329f170.png" 
+                  alt="TIET Medi-Care Logo" 
+                  className="h-10 mr-3 bg-white p-1 rounded"
+                />
                 <span className="text-2xl font-bold bg-gradient-to-r from-medical-blue-300 to-medical-green-300 bg-clip-text text-transparent">
                   TIET Medi-Care
                 </span>
