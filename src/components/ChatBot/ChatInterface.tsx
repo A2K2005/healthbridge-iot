@@ -20,17 +20,19 @@ interface ChatInterfaceProps {
   guestMessagesCount: number;
   incrementGuestMessageCount: () => void;
   onLoginRequest: () => void;
+  maxGuestMessages: number; // Added this prop to the interface
 }
 
-// Maximum number of messages for non-authenticated users
-const MAX_GUEST_MESSAGES = 3;
+// We're removing this constant since maxGuestMessages is now a prop
+// const MAX_GUEST_MESSAGES = 3;
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
   isOpen, 
   isAuthenticated, 
   guestMessagesCount, 
   incrementGuestMessageCount,
-  onLoginRequest
+  onLoginRequest,
+  maxGuestMessages
 }) => {
   const [messages, setMessages] = useState<Message[]>(() => {
     const savedMessages = localStorage.getItem('chatMessages');
@@ -60,7 +62,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     if (input.trim() === '') return;
     
     // Check if non-authenticated user has reached the message limit
-    if (!isAuthenticated && guestMessagesCount >= MAX_GUEST_MESSAGES) {
+    if (!isAuthenticated && guestMessagesCount >= maxGuestMessages) {
       return;
     }
     
@@ -87,7 +89,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       setIsTyping(false);
       
       // If this was the last allowed message for guest users
-      if (!isAuthenticated && guestMessagesCount + 1 >= MAX_GUEST_MESSAGES) {
+      if (!isAuthenticated && guestMessagesCount + 1 >= maxGuestMessages) {
         const limitMessage: Message = {
           id: (Date.now() + 1).toString(),
           text: "You've reached the limit for guest access. Sign in to continue our conversation and access all features.",
@@ -136,7 +138,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   const handleSuggestionClick = (suggestion: string) => {
     // Check if non-authenticated user has reached the message limit
-    if (!isAuthenticated && guestMessagesCount >= MAX_GUEST_MESSAGES) {
+    if (!isAuthenticated && guestMessagesCount >= maxGuestMessages) {
       return;
     }
     
@@ -162,7 +164,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       setIsTyping(false);
       
       // If this was the last allowed message for guest users
-      if (!isAuthenticated && guestMessagesCount + 1 >= MAX_GUEST_MESSAGES) {
+      if (!isAuthenticated && guestMessagesCount + 1 >= maxGuestMessages) {
         const limitMessage: Message = {
           id: (Date.now() + 1).toString(),
           text: "You've reached the limit for guest access. Sign in to continue our conversation and access all features.",
@@ -282,7 +284,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               <Lock className="h-4 w-4 text-blue-500" />
               <AlertTitle className="text-sm font-semibold text-blue-700">Limited access mode</AlertTitle>
               <AlertDescription className="text-xs text-blue-600">
-                You have {MAX_GUEST_MESSAGES - guestMessagesCount} message{MAX_GUEST_MESSAGES - guestMessagesCount !== 1 ? 's' : ''} remaining. 
+                You have {maxGuestMessages - guestMessagesCount} message{maxGuestMessages - guestMessagesCount !== 1 ? 's' : ''} remaining. 
                 <Button 
                   variant="link" 
                   className="text-xs p-0 h-auto text-medical-blue-600 hover:text-medical-blue-700 font-semibold" 
@@ -319,7 +321,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       {/* Input area */}
       <div className="p-4 border-t border-gray-200 bg-white rounded-b-md">
         {/* Show input only if user has remaining messages or is authenticated */}
-        {(isAuthenticated || guestMessagesCount < MAX_GUEST_MESSAGES) ? (
+        {(isAuthenticated || guestMessagesCount < maxGuestMessages) ? (
           <>
             <div className="flex gap-2">
               <Input
